@@ -308,14 +308,14 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
       <div class="nar-grid">
         <div>
           <div class="nar-ey">Cycle Analysis · April 2026</div>
-          <div class="nar-h">221 employees.<br><em>Half-way across</em><br>the finish line.</div>
+          <div class="nar-h">220 employees.<br><em>Half-way across</em><br>the finish line.</div>
           <p class="nar-p">The JAG CS Performance Review spans <strong>220 employees</strong> across Home Office functions and restaurant locations from DC to Las Vegas and beyond. As of today, <strong>93% of employees have submitted their self-appraisals</strong> — but only <strong>67% (147 employees) have a completed reviewer score</strong>, meaning the cycle is materially incomplete for more than a third of the workforce.</p>
           <p class="nar-p">Among those with completed reviewer scores, the average sits at <strong>3.61 / 5.00</strong> — solidly in the Advanced band. Employees rate themselves meaningfully higher at <strong>4.00</strong>, reflecting a consistent <strong>0.39-point perception gap</strong>. This gap is most pronounced in BOH roles and venue-level operations, and should inform calibration conversations before any merit or development decisions are finalized.</p>
           <p class="nar-p">Standout performers — <strong>Daniel Moline (4.83), Brett Talbot (4.83), Carlota Andres (4.50)</strong> — provide clear recognition anchors. On the other end, several employees with very low reviewer scores (<strong>Hayes 2.00, Hsu 1.50, Jimenez 1.33</strong>) require urgent follow-up. The most pressing action remains driving <strong>74 outstanding reviewer completions</strong>.</p>
         </div>
         <div class="nar-stats">
-          <div class="nar-stat"><div class="ns-num c-green">93%</div><div><div class="ns-l">Self-Appraisal Rate</div><div class="ns-d">206 of 221 submitted their self-review</div></div></div>
-          <div class="nar-stat"><div class="ns-num c-peri">67%</div><div><div class="ns-l">Reviewer Completion</div><div class="ns-d">147 of 221 have a reviewer score</div></div></div>
+          <div class="nar-stat"><div class="ns-num c-green">93%</div><div><div class="ns-l">Self-Appraisal Rate</div><div class="ns-d">206 of 220 submitted their self-review</div></div></div>
+          <div class="nar-stat"><div class="ns-num c-peri">67%</div><div><div class="ns-l">Reviewer Completion</div><div class="ns-d">147 of 220 have a reviewer score</div></div></div>
           <div class="nar-stat"><div class="ns-num c-gold">−0.39</div><div><div class="ns-l">Perception Gap</div><div class="ns-d">Reviewer avg 3.61 vs. self avg 4.00</div></div></div>
         </div>
       </div>
@@ -382,7 +382,7 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
     <!-- KPI CARDS — always visible -->
     <div class="g5">
       <div class="kpi k-navy"><div class="kpi-n">220</div><div class="kpi-l">Total<br>Employees</div></div>
-      <div class="kpi k-green"><div class="kpi-n">7%</div><div class="kpi-l">Fully<br>Complete</div><div class="kpi-s">16 of 221</div></div>
+      <div class="kpi k-green"><div class="kpi-n">7%</div><div class="kpi-l">Fully<br>Complete</div><div class="kpi-s">16 of 220</div></div>
       <div class="kpi k-blue"><div class="kpi-n">83%</div><div class="kpi-l">Self Appraisal<br>Done</div><div class="kpi-s">183 self appraisal complete</div></div>
       <div class="kpi k-amber"><div class="kpi-n">8%</div><div class="kpi-l">Self Appraisal<br>Pending</div><div class="kpi-s">17 employees outstanding</div></div>
       <div class="kpi k-peri"><div class="kpi-n">2</div><div class="kpi-l">Reviewer<br>Pending</div><div class="kpi-s">Awaiting reviewer action</div></div>
@@ -684,10 +684,9 @@ See you [date/time].
         <div style="font-size:10px;color:var(--midgrey);white-space:nowrap;margin-left:8px;">▼ Expand</div>
       </div>
       <div class="rec-body">
-        <p>Two data quality issues continue to limit this cycle's analytical value: (1) Only 17 of 220 employees (8%) have provided ethnic/racial identity data, preventing equity analysis; (2) Several employees have blank or "Not Defined" position descriptions, reducing functional segmentation accuracy. Note: a test record ("emma test2") was identified and removed from this analysis — the underlying Paylocity record should be deleted or moved to a test company code.</p>
+        <p>Two data quality issues continue to limit this cycle's analytical value: (1) Only 17 of 220 employees (8%) have provided ethnic/racial identity data, preventing equity analysis; (2) Several employees have blank or "Not Defined" position descriptions, reducing functional segmentation accuracy.</p>
         <div class="action-bullets">
           <div class="ab-item"><span class="ab-check">→</span> Launch a voluntary self-identification campaign with context on why the data is collected and how it's protected</div>
-          <div class="ab-item"><span class="ab-check">→</span> Delete or segregate the "emma test2" test record in Paylocity (ID 74001244) — it is currently appearing in production review exports</div>
           <div class="ab-item"><span class="ab-check">→</span> Audit and clean up "Not Defined" and blank position descriptions before the next cycle</div>
           <div class="ab-item"><span class="ab-check">→</span> Consider adding position family codes as a required field at onboarding</div>
         </div>
