@@ -157,8 +157,13 @@ body{font-family:'DM Sans',sans-serif;color:var(--black);background:var(--bg);fo
 .part-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 3px 8px rgba(26,33,97,0.22);}
 .tab-pane{display:none;}
 .tab-pane.active{display:block;}
-.part-search{border:1.5px solid var(--rule);border-radius:4px;padding:8px 14px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);width:100%;margin-bottom:14px;}
-.part-search:focus{outline:2px solid var(--blue);border-color:var(--blue);}
+.part-search-wrap{display:flex;align-items:center;gap:0;background:var(--card);border:2px solid var(--lightblue);border-radius:6px;margin-bottom:20px;transition:border-color 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.part-search-wrap:focus-within{border-color:var(--navy);}
+.part-search-icon{padding:0 12px;display:flex;align-items:center;flex-shrink:0;}
+.part-search-input{flex:1;border:none;background:transparent;padding:13px 0;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--black);outline:none;}
+.part-search-input::placeholder{color:var(--midgrey);}
+.part-search-clear{background:none;border:none;cursor:pointer;padding:0 14px;font-size:18px;color:var(--midgrey);line-height:1;flex-shrink:0;}
+.part-search-clear:hover{color:var(--navy);}
 .part-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);}
 .part-row:last-child{border-bottom:none;}
 .part-name{flex:1;min-width:0;}
@@ -366,6 +371,14 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
       <div class="part-tab" onclick="switchTab('rev')">By Reviewer</div>
       <div class="part-tab" onclick="switchTab('emp')">By Employee</div>
     </div>
+    <!-- GLOBAL SEARCH — filters all content in active tab -->
+    <div class="part-search-wrap">
+      <div class="part-search-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="var(--midgrey)" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="var(--midgrey)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <input type="text" id="part-search" class="part-search-input" placeholder="Search locations…" oninput="handlePartSearch()"/>
+      <button class="part-search-clear" id="part-search-clear" onclick="clearPartSearch()" style="display:none">×</button>
+    </div>
     <!-- KPI CARDS — always visible -->
     <div class="g5">
       <div class="kpi k-navy"><div class="kpi-n">220</div><div class="kpi-l">Total<br>Employees</div></div>
@@ -384,7 +397,6 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
       <div class="sec-hd">Completion Detail</div>
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">Completion by Location</span><span class="card-hd-m" id="loc-meta">37 locations</span></div>
-        <div class="tbl-search-row"><input class="part-search" id="loc-search" placeholder="Search location…" oninput="filterLocTable()"/></div>
         <div class="tbl-wrap"><table><thead><tr>
           <th onclick="sortPartTable('loc-t','loc',0)">Location</th>
           <th onclick="sortPartTable('loc-t','total',1)" class="sorted">Total ↓</th>
@@ -402,7 +414,6 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
       <div class="sec-hd">Reviewer Completion &amp; Scoring</div>
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">Completion by Reviewer</span><span class="card-hd-m" id="rev-meta">All reviewers</span></div>
-        <div class="tbl-search-row"><input class="part-search" id="rev-search" placeholder="Search reviewer…" oninput="filterRevTable()"/></div>
         <div class="tbl-wrap"><table><thead><tr>
           <th onclick="sortPartTable('rev-t','name',0)">Reviewer</th>
           <th onclick="sortPartTable('rev-t','total',1)" class="sorted">Direct Reports ↓</th>
@@ -428,8 +439,7 @@ select.fsel:focus{outline:2px solid var(--blue);border-color:var(--blue);}
           <option value="Employee Self Appraisal Pending">Self Appraisal Pending</option>
           <option value="Reviewer Appraisal Pending">Reviewer Appraisal Pending</option>
         </select>
-        <input type="text" class="fsel" id="p-fQ" placeholder="Search employee…" oninput="filterEmpPart()" style="min-width:200px;">
-        <button class="f-rst" onclick="resetEmpPart()">↺ Reset</button>
+        <button class="f-rst" onclick="resetEmpPart()">↺ Reset Filters</button>
       </div>
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">Employee Status</span><span class="card-hd-m" id="emp-part-meta">221 employees</span></div>
@@ -819,8 +829,15 @@ function renderLocTable(data){
   </tr>`).join('');
 }
 function filterLocTable(){
-  const q=document.getElementById('loc-search').value.toLowerCase();
-  renderLocTable(window._locData.filter(r=>r.loc.toLowerCase().includes(q)));
+  const q=(document.getElementById('part-search')||{value:''}).value.toLowerCase();
+  const filtered=window._locData.filter(r=>r.loc.toLowerCase().includes(q));
+  renderLocTable(filtered);
+  // Also filter tiles
+  const data=D.filter(e=>e.id!=='74001244'&&(!q||e.loc.toLowerCase().includes(q)));
+  const map={};
+  data.forEach(e=>{if(!e.loc)return;if(!map[e.loc])map[e.loc]={s:[],t:0};map[e.loc].t++;if(e.rr&&e.rr>=0.5)map[e.loc].s.push(e.rr);});
+  const locs=Object.entries(map).filter(([,d])=>d.s.length>=2).map(([l,d])=>({l,avg:+(d.s.reduce((a,b)=>a+b,0)/d.s.length).toFixed(2),rated:d.s.length,total:d.t})).sort((a,b)=>b.avg-a.avg);
+  document.getElementById('part-locs').innerHTML=locs.length?locs.map(l=>`<div class="loc-tile"><div class="loc-n">${l.l}</div><div class="loc-s" style="color:${RC(l.avg)}">${l.avg.toFixed(2)}</div><div class="loc-m">${l.rated} rated · ${l.total} total</div><div class="loc-bt"><div class="loc-bf" style="width:${(l.avg/5*100).toFixed(0)}%;background:${RC(l.avg)}"></div></div></div>`).join(''):'<div style="padding:20px;color:var(--midgrey);font-style:italic">No locations match</div>';
 }
 let _locSortKey='total';let _locSortAsc=false;
 function buildRevTable(){
@@ -847,7 +864,7 @@ function renderRevTable(data){
   </tr>`).join('');
 }
 function filterRevTable(){
-  const q=document.getElementById('rev-search').value.toLowerCase();
+  const q=(document.getElementById('part-search')||{value:''}).value.toLowerCase();
   renderRevTable(window._revData.filter(r=>r.name.toLowerCase().includes(q)));
 }
 let _pFilt={loc:'',sup:'',st:'',q:''};
@@ -863,7 +880,7 @@ function filterEmpPart(){
   const loc=document.getElementById('p-fLoc').value;
   const sup=document.getElementById('p-fSup').value;
   const st=document.getElementById('p-fSt').value;
-  const q=document.getElementById('p-fQ').value.toLowerCase();
+  const q=(document.getElementById('part-search')||{value:''}).value.toLowerCase();
   const data=D.filter(e=>{
     if(loc&&e.loc!==loc)return false;
     if(sup&&e.sup!==sup)return false;
@@ -881,13 +898,45 @@ function filterEmpPart(){
     <td><span class="st-chip ${SCL(e.st)}">${SST(e.st)}</span></td>
   </tr>`).join('');
 }
-function resetEmpPart(){['p-fLoc','p-fSup','p-fSt'].forEach(id=>document.getElementById(id).value='');document.getElementById('p-fQ').value='';filterEmpPart();}
+function resetEmpPart(){['p-fLoc','p-fSup','p-fSt'].forEach(id=>document.getElementById(id).value='');clearPartSearch();filterEmpPart();}
 function switchTab(id){
   document.querySelectorAll('.part-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   const map={loc:0,rev:1,emp:2};
   document.querySelectorAll('.part-tab')[map[id]].classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+  // Clear search and update placeholder
+  const srch=document.getElementById('part-search');
+  if(srch){srch.value='';document.getElementById('part-search-clear').style.display='none';}
+  const placeholders={loc:'Search locations…',rev:'Search reviewers…',emp:'Search employees, positions, locations…'};
+  if(srch)srch.placeholder=placeholders[id]||'Search…';
+  // Re-render active tab content
+  if(id==='loc'){filterLocTable();}
+  else if(id==='rev'){filterRevTable();}
+  else if(id==='emp'){filterEmpPart();}
+}
+function handlePartSearch(){
+  const srch=document.getElementById('part-search');
+  const clr=document.getElementById('part-search-clear');
+  if(clr)clr.style.display=srch.value?'block':'none';
+  // Figure out active tab and call its filter
+  const activePaneId=document.querySelector('.tab-pane.active')||{id:''};
+  const paneId=activePaneId.id||'tab-loc';
+  if(paneId==='tab-loc')filterLocTable();
+  else if(paneId==='tab-rev')filterRevTable();
+  else if(paneId==='tab-emp')filterEmpPart();
+}
+function clearPartSearch(){
+  const srch=document.getElementById('part-search');
+  if(srch)srch.value='';
+  const clr=document.getElementById('part-search-clear');
+  if(clr)clr.style.display='none';
+  // Re-render
+  const activePaneId=document.querySelector('.tab-pane.active')||{id:''};
+  const paneId=activePaneId.id||'tab-loc';
+  if(paneId==='tab-loc')filterLocTable();
+  else if(paneId==='tab-rev')filterRevTable();
+  else if(paneId==='tab-emp')filterEmpPart();
 }
 function sortPartTable(tbl,key,col){window._locData&&renderLocTable([...window._locData].sort((a,b)=>typeof a[key]==='string'?a[key].localeCompare(b[key]):b[key]-a[key]));}
 
